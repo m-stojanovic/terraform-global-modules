@@ -1,0 +1,30 @@
+#cloud-config
+
+preserve_hostname: true
+manage_etc_hosts: false
+
+bootcmd:
+ - "sed -i '/HOSTNAME/s/localhost/${HOSTNAME}/' /etc/sysconfig/network"
+ - "service network restart"
+ - "echo ${HOSTNAME}-$INSTANCE_ID > /etc/hostname; hostname -F /etc/hostname"
+ - "echo '10.249.96.60    hub-auto-puppetmaster.eu-west-1.compute.internal' | sudo tee /etc/hosts"
+ - "wget https://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm --no-check-certificate"
+ - "yum install -y ./puppetlabs-release-pc1-el-6.noarch.rpm"
+ - "yum install -y puppet | true"
+ - "hostnamectl set-hostname ${HOSTNAME}-$INSTANCE_ID"
+
+# Don't print the new ssh keys on the console
+no_ssh_fingerprints: true
+
+write_files:
+ - path: /etc/puppetlabs/puppet/puppet.conf
+   owner: root:root
+   permissions: '0444'
+   content: |
+     [main]
+     environment = ${ENVIRONMENT}
+     server = hub-auto-puppetmaster.eu-west-1.compute.internal
+
+runcmd:
+ - "until $(grep -q 'hub-auto-puppetmaster' '/etc/puppetlabs/puppet/puppet.conf'); do sleep 1; done; service puppet restart"
+ - "sleep 60; while [ -f /opt/puppetlabs/puppet/cache/state/agent_catalog_run.lock ]; do sleep 10; done; service puppet restart; if [[ $HOSTNAME =~ mkt ]]; then sleep 160; for i in $(ls /etc/init.d/mkt-*); do $i restart; done; fi"

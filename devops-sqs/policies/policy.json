@@ -1,0 +1,13 @@
+{
+  "Version": "2012-10-17",
+  "Id": "arn:aws:sqs:eu-west-1:*:*",
+  "Statement": [
+    {
+      "Sid": "sqs",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "SQS:*",
+      "Resource": "arn:aws:sqs:eu-west-1:123456789876:*"
+    }
+  ]
+}
