@@ -1,0 +1,26 @@
+image: hashicorp/terraform:1.9.8
+
+definitions:
+  steps:
+    - step: &security_scan
+        name: Security Scan
+        script:
+          - pipe: atlassian/git-secrets-scan:3.0.0
+
+    - step: &validation
+        name: Terraform Validation
+        script:
+          - |
+              echo "Running terraform fmt"
+              terraform fmt -check -recursive
+              for dir in $(find . -type f -name "*.tf" -not -path "./modules/route53/zone-cross-account-vpc-association/*" -exec dirname {} \; | sort -u); do
+                echo "Running terraform validate in $dir"
+                (cd "$dir" && terraform init && terraform validate) || exit 1
+              done
+
+pipelines:
+  branches:
+    "DEVOPS-*":
+      - step: *security_scan
+      - step: *validation
+      

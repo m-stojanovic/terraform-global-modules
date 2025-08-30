@@ -1,0 +1,143 @@
+{
+    "projects": [
+        {
+            "name": "devops",
+            "description": "AWS devops infrastructure",
+            "workspaces": [
+                "terraform-devops-shared",
+                "terraform-devops-infrastructure-dev",
+                "terraform-devops-infrastructure-stg",
+                "terraform-devops-infrastructure-prod"
+            ]
+        }
+    ],
+    "workspaces": [
+        {
+            "name": "terraform-devops-shared",
+            "description": "The Workspace for devops AWS Shared Infrastructure",
+            "working_directory": "terraform/regions/ap-southeast-1",
+            "remote_state_shared": [
+                "terraform-devops-infrastructure-dev",
+                "terraform-devops-infrastructure-stg",
+                "terraform-devops-infrastructure-prod"
+            ],
+            "teams": [
+                {
+                    "name": "techops",
+                    "access_level": "admin"
+                }
+            ],
+            "terraform_version": "1.9.8",
+            "vcs_repo": [
+                {
+                    "branch": "main",
+                    "identifier": "devops/terraform-devops-shared"
+                }
+            ],
+            "tag_names": [
+                "devops",
+                "techops",
+                "shared"
+            ]
+        },
+        {
+            "name": "terraform-devops-infrastructure-dev",
+            "description": "The Workspace for devops dev AWS Infrastructure",
+            "working_directory": "terraform/regions/ap-southeast-1",
+            "execution_mode" : "local",
+            "run_triggers": [
+                "terraform-devops-infrastructure-stg"
+            ],
+            "teams": [
+                {
+                    "name": "techops",
+                    "access_level": "admin"
+                }
+            ],
+            "terraform_version": "1.9.8",
+            "vcs_repo": [
+                {
+                    "branch": "main",
+                    "identifier": "devops/terraform-devops-infrastructure"
+                }
+            ],
+            "tag_names": [
+                "devops",
+                "techops",
+                "dev"
+            ]
+        },
+        {
+            "name": "terraform-devops-infrastructure-stg",
+            "description": "The Workspace for devops stg AWS Infrastructure",
+            "working_directory": "terraform/regions/ap-southeast-1",
+            "run_triggers": [
+                "terraform-devops-infrastructure-prod"
+            ],
+            "teams": [
+                {
+                    "name": "techops",
+                    "access_level": "admin"
+                }
+            ],
+            "terraform_version": "1.9.8",
+            "vcs_repo": [
+                {
+                    "branch": "main",
+                    "identifier": "devops/terraform-devops-infrastructure"
+                }
+            ],
+            "tag_names": [
+                "devops",
+                "techops",
+                "stg"
+            ]
+        },
+        {
+            "name": "terraform-devops-infrastructure-prod",
+            "description": "The Workspace for devops prod AWS Infrastructure",
+            "working_directory": "terraform/regions/ap-southeast-1",
+            "trigger_patterns": [
+                "/ignore"
+            ],
+            "teams": [
+                {
+                    "name": "techops",
+                    "access_level": "admin"
+                }
+            ],
+            "terraform_version": "1.9.8",
+            "vcs_repo": [
+                {
+                    "branch": "main",
+                    "identifier": "devops/terraform-devops-infrastructure"
+                }
+            ],
+            "tag_names": [
+                "devops",
+                "techops",
+                "prod"
+            ]
+        }
+    ],
+    "teams": [
+        {
+            "name": "techops",
+            "visibility": "organization",
+            "organization_access": {
+                "manage_policies": true,
+                "manage_policy_overrides": true,
+                "manage_workspaces": true,
+                "manage_vcs_settings": true
+            },
+            "members": [
+                "milos.stojanovic@devops.co",
+                "william.lucia@devops.co",
+                "artur.naciscionis@devops.co",
+                "vivek.singh@devops.co",
+                "vladimir.kramar@devops.co",
+                "aleksandar.stefanovic@devops.co"
+            ]
+        }
+    ]
+}
